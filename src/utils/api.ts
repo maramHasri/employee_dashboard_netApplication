@@ -21,6 +21,7 @@ export interface User {
   national_id: string;
   identifier: string;
   role: string;
+  fcm_token?: string;
 }
 
 export interface LoginResponse {
@@ -88,6 +89,38 @@ export const getComplaints = async (): Promise<ComplaintsResponse> => {
       Authorization: `Bearer ${authToken}`,
     },
   });
+  return response.data;
+};
+
+export interface UpdateComplaintStatusRequest {
+  status: string;
+}
+
+export interface UpdateComplaintStatusResponse {
+  success: boolean;
+  message: string;
+  data: Complaint;
+  status_code: number;
+  timestamp: string;
+}
+
+export const updateComplaintStatus = async (
+  complaintId: number,
+  status: string
+): Promise<UpdateComplaintStatusResponse> => {
+  const authToken = localStorage.getItem('auth_token');
+  if (!authToken) {
+    throw new Error('No authentication token found');
+  }
+  const response = await apiClient.put<UpdateComplaintStatusResponse>(
+    `/api/employee/complaints/${complaintId}`,
+    { status } as UpdateComplaintStatusRequest,
+    {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    }
+  );
   return response.data;
 };
 

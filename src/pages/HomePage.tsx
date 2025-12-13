@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { getComplaints } from '../utils/api';
+import { getComplaints, updateComplaintStatus } from '../utils/api';
 import type { User, Complaint } from '../utils/api';
 import { toast } from 'react-toastify';
+import { sendPushNotification } from '../utils/firebase';
 import './HomePage.css';
 
 const getUserFromStorage = (): User | null => {
@@ -23,6 +24,7 @@ const HomePage = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<Record<number, boolean>>({});
 
   const fetchComplaints = useCallback(async (): Promise<void> => {
     setIsLoading(true);
@@ -91,10 +93,64 @@ const HomePage = () => {
 
   const getStatusClass = (status: string): string => {
     const statusLower = status.toLowerCase();
-    if (statusLower.includes('pending')) return 'status-pending';
-    if (statusLower.includes('resolved') || statusLower.includes('completed')) return 'status-resolved';
-    if (statusLower.includes('in_progress') || statusLower.includes('processing')) return 'status-in-progress';
+    if (statusLower === 'new') return 'status-new';
+    if (statusLower === 'in_progress') return 'status-in-progress';
+    if (statusLower === 'rejected') return 'status-rejected';
+    if (statusLower === 'completed') return 'status-completed';
     return 'status-default';
+  };
+
+  const getStatusLabel = (status: string): string => {
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
+      case 'new':
+        return 'جديد';
+      case 'in_progress':
+        return 'قيد المعالجة';
+      case 'rejected':
+        return 'مرفوض';
+      case 'completed':
+        return 'مكتمل';
+      default:
+        return status;
+    }
+  };
+
+  const handleStatusChange = async (complaintId: number, newStatus: string, userFcmToken?: string): Promise<void> => {
+    setUpdatingStatus((prev) => ({ ...prev, [complaintId]: true }));
+    try {
+      const response = await updateComplaintStatus(complaintId, newStatus);
+      if (response.success) {
+        setComplaints((prevComplaints) =>
+          prevComplaints.map((complaint) =>
+            complaint.id === complaintId ? { ...complaint, status: newStatus } : complaint
+          )
+        );
+        toast.success('تم تحديث حالة الشكوى بنجاح');
+        if (userFcmToken) {
+          try {
+            await sendPushNotification(
+              userFcmToken,
+              'تحديث حالة الشكوى',
+              `تم تحديث حالة شكواك إلى: ${getStatusLabel(newStatus)}`
+            );
+          } catch (fcmError) {
+            console.error('Failed to send push notification:', fcmError);
+          }
+        }
+      } else {
+        toast.error(response.message || 'فشل تحديث حالة الشكوى');
+      }
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const errorMessage = err.response?.data?.message || 'فشل تحديث حالة الشكوى. يرجى المحاولة مرة أخرى.';
+        toast.error(errorMessage);
+      } else {
+        toast.error('حدث خطأ غير متوقع');
+      }
+    } finally {
+      setUpdatingStatus((prev) => ({ ...prev, [complaintId]: false }));
+    }
   };
 
   if (!user) {
@@ -145,9 +201,26 @@ const HomePage = () => {
             {complaints.map((complaint) => (
               <div key={complaint.id} className="complaint-card">
                 <div className="complaint-header">
-                  <span className={`status-badge ${getStatusClass(complaint.status)}`}>
-                    {complaint.status}
-                  </span>
+                  <div className="status-select-wrapper">
+                    <label htmlFor={`status-${complaint.id}`} className="status-label">
+                      حالة الشكوى:
+                    </label>
+                    <select
+                      id={`status-${complaint.id}`}
+                      className={`status-select ${getStatusClass(complaint.status)}`}
+                      value={complaint.status}
+                      onChange={(e) => handleStatusChange(complaint.id, e.target.value, complaint.user.fcm_token)}
+                      disabled={updatingStatus[complaint.id]}
+                    >
+                      <option value="new">جديد</option>
+                      <option value="in_progress">قيد المعالجة</option>
+                      <option value="rejected">مرفوض</option>
+                      <option value="completed">مكتمل</option>
+                    </select>
+                    {updatingStatus[complaint.id] && (
+                      <span className="status-updating">جاري التحديث...</span>
+                    )}
+                  </div>
                 </div>
                 <div className="complaint-body">
                   <div className="complaint-field">
