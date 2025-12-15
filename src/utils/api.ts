@@ -9,6 +9,20 @@ const apiClient = axios.create({
   },
 });
 
+apiClient.interceptors.request.use(
+  (config) => {
+    const authToken = localStorage.getItem('auth_token');
+    const isLoginRequest = config.url?.includes('/api/auth/login');
+    if (authToken && config.headers && !isLoginRequest) {
+      config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export interface LoginRequest {
   identifier: string;
   password: string;
@@ -35,41 +49,40 @@ export interface LoginResponse {
   timestamp: string;
 }
 
-export interface ComplaintType {
+export interface Employee {
   id: number;
   name: string;
-}
-
-export interface Destination {
-  id: number;
-  name: string;
-}
-
-export interface Document {
-  id: number;
-  file: string;
-}
-
-export interface Complaint {
-  id: number;
+  national_id: string;
   identifier: string;
-  description: string;
-  status: string;
-  lat: number;
-  lng: number;
-  address: string;
-  locked_at: string | null;
-  created_at: string;
-  user: User;
-  complaint_type: ComplaintType;
-  destination: Destination;
-  documents: Document[];
+  destination_id: number;
+  destination?: {
+    id: number;
+    name: string;
+  };
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface ComplaintsResponse {
+export interface EmployeesResponse {
   success: boolean;
   message: string;
-  data: Complaint[];
+  data: Employee[];
+  status_code: number;
+  timestamp: string;
+}
+
+export interface CreateEmployeeRequest {
+  name: string;
+  national_id: string;
+  identifier: string;
+  password: string;
+  destination_id: number;
+}
+
+export interface CreateEmployeeResponse {
+  success: boolean;
+  message: string;
+  data: Employee;
   status_code: number;
   timestamp: string;
 }
@@ -79,50 +92,14 @@ export const login = async (credentials: LoginRequest): Promise<LoginResponse> =
   return response.data;
 };
 
-export const getComplaints = async (): Promise<ComplaintsResponse> => {
-  const authToken = localStorage.getItem('auth_token');
-  if (!authToken) {
-    throw new Error('No authentication token found');
-  }
-  const response = await apiClient.get<ComplaintsResponse>('/api/employee/complaints', {
-    headers: {
-      Authorization: `Bearer ${authToken}`,
-    },
-  });
+export const getEmployees = async (): Promise<EmployeesResponse> => {
+  const response = await apiClient.get<EmployeesResponse>('/api/admin/employees');
   return response.data;
 };
 
-export interface UpdateComplaintStatusRequest {
-  status: string;
-}
-
-export interface UpdateComplaintStatusResponse {
-  success: boolean;
-  message: string;
-  data: Complaint;
-  status_code: number;
-  timestamp: string;
-}
-
-export const updateComplaintStatus = async (
-  complaintId: number,
-  status: string
-): Promise<UpdateComplaintStatusResponse> => {
-  const authToken = localStorage.getItem('auth_token');
-  if (!authToken) {
-    throw new Error('No authentication token found');
-  }
-  const response = await apiClient.put<UpdateComplaintStatusResponse>(
-    `/api/employee/complaints/${complaintId}`,
-    { status } as UpdateComplaintStatusRequest,
-    {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    }
-  );
+export const createEmployee = async (employeeData: CreateEmployeeRequest): Promise<CreateEmployeeResponse> => {
+  const response = await apiClient.post<CreateEmployeeResponse>('/api/admin/employees', employeeData);
   return response.data;
 };
 
 export default apiClient;
-

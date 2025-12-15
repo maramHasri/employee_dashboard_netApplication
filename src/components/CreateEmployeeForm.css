@@ -1,0 +1,89 @@
+.create-employee-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.create-employee-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.create-employee-form label {
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+}
+
+.create-employee-form input {
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+  font-family: inherit;
+}
+
+.create-employee-form input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.create-employee-form input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.create-employee-form input.error {
+  border-color: #d32f2f;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: -4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.cancel-button,
+.submit-button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.cancel-button {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.submit-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.submit-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.cancel-button:disabled,
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

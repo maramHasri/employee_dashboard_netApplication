@@ -1,13 +1,14 @@
-.login-container {
+.admin-login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  direction: rtl;
 }
 
-.login-card {
+.admin-login-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
@@ -16,7 +17,7 @@
   max-width: 400px;
 }
 
-.login-title {
+.admin-login-title {
   text-align: center;
   color: #333;
   margin-bottom: 30px;
@@ -24,7 +25,7 @@
   font-weight: 600;
 }
 
-.login-form {
+.admin-login-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -36,22 +37,26 @@
   gap: 8px;
 }
 
+.password-group {
+  position: relative;
+}
+
 .form-group label {
-  color: #555;
   font-weight: 500;
+  color: #555;
   font-size: 14px;
 }
 
 .form-group input {
-  padding: 12px 16px;
+  padding: 12px;
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   font-size: 16px;
-  transition: border-color 0.3s ease;
-  outline: none;
+  transition: border-color 0.3s;
 }
 
 .form-group input:focus {
+  outline: none;
   border-color: #667eea;
 }
 
@@ -60,30 +65,20 @@
   cursor: not-allowed;
 }
 
-.password-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.password-input-wrapper input {
-  padding-right: 45px;
-  width: 100%;
-}
-
 .password-toggle {
   position: absolute;
   right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
+  color: #999;
   padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
-  transition: color 0.3s ease;
-  outline: none;
+  transition: color 0.3s;
 }
 
 .password-toggle:hover:not(:disabled) {
@@ -91,16 +86,16 @@
 }
 
 .password-toggle:disabled {
-  opacity: 0.5;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
-.password-toggle svg {
-  display: block;
+.password-group input {
+  padding-right: 45px;
 }
 
 .login-button {
-  padding: 14px;
+  padding: 12px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
@@ -108,17 +103,12 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.3s ease, transform 0.2s ease;
+  transition: opacity 0.3s;
   margin-top: 10px;
 }
 
 .login-button:hover:not(:disabled) {
   opacity: 0.9;
-  transform: translateY(-2px);
-}
-
-.login-button:active:not(:disabled) {
-  transform: translateY(0);
 }
 
 .login-button:disabled {
