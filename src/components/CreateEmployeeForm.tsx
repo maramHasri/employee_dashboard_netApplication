@@ -24,23 +24,23 @@ const CreateEmployeeForm = ({ onSuccess, onCancel }: CreateEmployeeFormProps) =>
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateEmployeeRequest, string>> = {};
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = 'الاسم مطلوب';
     }
     if (!formData.national_id.trim()) {
-      newErrors.national_id = 'National ID is required';
+      newErrors.national_id = 'الهوية الوطنية مطلوبة';
     }
     if (!formData.identifier.trim()) {
-      newErrors.identifier = 'Identifier is required';
+      newErrors.identifier = 'المعرف مطلوب';
     } else if (!formData.identifier.startsWith('+')) {
-      newErrors.identifier = 'Identifier must start with +';
+      newErrors.identifier = 'يجب أن يبدأ المعرف بعلامة +';
     }
     if (!formData.password.trim()) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'كلمة المرور مطلوبة';
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
     }
     if (!formData.destination_id || formData.destination_id < 1) {
-      newErrors.destination_id = 'Destination ID is required';
+      newErrors.destination_id = 'رقم الجهة مطلوب';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -49,7 +49,7 @@ const CreateEmployeeForm = ({ onSuccess, onCancel }: CreateEmployeeFormProps) =>
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
+      toast.error('يرجى إصلاح الأخطاء في النموذج');
       return;
     }
     setIsLoading(true);
@@ -94,65 +94,60 @@ const CreateEmployeeForm = ({ onSuccess, onCancel }: CreateEmployeeFormProps) =>
   return (
     <form onSubmit={handleSubmit} className="create-employee-form">
       <div className="form-group">
-        <label htmlFor="name">Name *</label>
         <input
           id="name"
           type="text"
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
-          placeholder="Enter employee name"
+          placeholder="أدخل اسم الموظف"
           disabled={isLoading}
           className={errors.name ? 'error' : ''}
         />
         {errors.name && <span className="error-message">{errors.name}</span>}
       </div>
       <div className="form-group">
-        <label htmlFor="national_id">National ID *</label>
         <input
           id="national_id"
           type="text"
           value={formData.national_id}
           onChange={(e) => handleChange('national_id', e.target.value)}
-          placeholder="Enter national ID"
+          placeholder="أدخل الهوية الوطنية"
           disabled={isLoading}
           className={errors.national_id ? 'error' : ''}
         />
         {errors.national_id && <span className="error-message">{errors.national_id}</span>}
       </div>
       <div className="form-group">
-        <label htmlFor="identifier">Identifier *</label>
         <input
           id="identifier"
           type="text"
           value={formData.identifier}
           onChange={(e) => handleChange('identifier', e.target.value)}
-          placeholder="+963980453436"
+          placeholder="أدخل المعرف (+963980453436)"
           disabled={isLoading}
           className={errors.identifier ? 'error' : ''}
         />
         {errors.identifier && <span className="error-message">{errors.identifier}</span>}
       </div>
       <div className="form-group">
-        <label htmlFor="password">Password *</label>
         <input
           id="password"
           type="password"
           value={formData.password}
           onChange={(e) => handleChange('password', e.target.value)}
-          placeholder="Enter password (min 6 characters)"
+          placeholder="أدخل كلمة المرور (6 أحرف على الأقل)"
           disabled={isLoading}
           className={errors.password ? 'error' : ''}
         />
         {errors.password && <span className="error-message">{errors.password}</span>}
       </div>
       <div className="form-group">
-        <label htmlFor="destination_id">Destination ID *</label>
         <input
           id="destination_id"
           type="number"
           value={formData.destination_id}
           onChange={(e) => handleChange('destination_id', parseInt(e.target.value, 10))}
-          placeholder="1"
+          placeholder="أدخل رقم الجهة"
           disabled={isLoading}
           min="1"
           className={errors.destination_id ? 'error' : ''}
@@ -161,10 +156,10 @@ const CreateEmployeeForm = ({ onSuccess, onCancel }: CreateEmployeeFormProps) =>
       </div>
       <div className="form-actions">
         <button type="button" onClick={onCancel} className="cancel-button" disabled={isLoading}>
-          Cancel
+          إلغاء
         </button>
         <button type="submit" className="submit-button" disabled={isLoading}>
-          {isLoading ? 'Creating...' : 'Create Employee'}
+          {isLoading ? 'جاري الإنشاء...' : 'إنشاء موظف'}
         </button>
       </div>
     </form>
